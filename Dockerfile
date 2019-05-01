@@ -1,15 +1,15 @@
 FROM debian:jessie
-LABEL maintainer "sujaikumar@gmail.com"
+LABEL maintainer "rjchallis@gmail.com"
 
 RUN apt-get update && apt-get install -y \
     parallel \
     wget
 
 
-RUN wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.6.0/ncbi-blast-2.6.0+-x64-linux.tar.gz && \
-    tar xzf ncbi-blast-2.6.0+-x64-linux.tar.gz
+RUN wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.9.0/ncbi-blast-2.9.0+-x64-linux.tar.gz && \
+    tar xzf ncbi-blast-2.9.0+-x64-linux.tar.gz
 
-ENV PATH=".:/ncbi-blast-2.6.0+/bin:${PATH}"
+ENV PATH=".:/ncbi-blast-2.9.0+/bin:${PATH}"
 
 RUN mkdir /query && mkdir /db && mkdir /out
 
@@ -20,6 +20,8 @@ RUN chown -R dockeruser /out
 COPY blast.pl /
 
 RUN chmod a+x blast.pl
+
+ENV SHELL /bin/bash
 
 RUN parallel ln -s blast.pl {} ::: blastn blastp blastx deltablast psiblast rpsblast rpstblastn tblastn tblastx 
 

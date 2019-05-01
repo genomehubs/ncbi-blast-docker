@@ -13,9 +13,9 @@ GetOptions (
   "h|help" => \$help,
 );
 
-$out =~ s/\.gz$//;
+$out =~ s/(\.gz)$//;
 
-my $blast_path = "/ncbi-blast-2.6.0+/bin";
+my $blast_path = "/ncbi-blast-2.9.0+/bin";
 my $blast = $0;
 
 die `$blast_path/$blast -help` if $help;
@@ -27,4 +27,6 @@ die "ERROR: query file '$query' not found\n" unless my $query_size = -s $query;
 
 my $block_size = int($query_size / $num_threads) + 1;
 
-system "cat $query | parallel -k -j $num_threads --block $block_size --recstart '>' --pipe \"$blast_path/$blast -query - $blast_args\" | gzip > $out.gz";
+my cat = $1 == '.gz' ? 'zcat' : 'cat'
+
+system "$cat $query | parallel -k -j $num_threads --block $block_size --recstart '>' --pipe \"$blast_path/$blast -query - $blast_args\" | gzip > $out.gz";
