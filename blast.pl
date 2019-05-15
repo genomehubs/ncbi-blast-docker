@@ -15,6 +15,11 @@ GetOptions (
 
 $out =~ s/(\.gz)$//;
 
+my $cat = "cat";
+if ($query =~ m/\.gz$/){
+  $cat = "zcat";
+}
+
 my $blast_path = "/ncbi-blast-2.9.0+/bin";
 my $blast = $0;
 
@@ -26,7 +31,5 @@ $blast_args   .= " -outfmt \'$outfmt\'" if $outfmt; #put quotes around -outfmt o
 die "ERROR: query file '$query' not found\n" unless my $query_size = -s $query;
 
 my $block_size = int($query_size / $num_threads) + 1;
-
-my cat = $1 == '.gz' ? 'zcat' : 'cat'
 
 system "$cat $query | parallel -k -j $num_threads --block $block_size --recstart '>' --pipe \"$blast_path/$blast -query - $blast_args\" | gzip > $out.gz";
